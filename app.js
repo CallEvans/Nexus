@@ -1,11 +1,11 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════
-// NEXUS — app.js (Supabase Live)
+// NEXUS — app.js (Supabase Live · Error‑Free)
 // ═══════════════════════════════════════════════════════
 
 let currentUser = null;
-let currentChat = null;          // { id, username, name, ... } for 1-on-1 or group
+let currentChat = null;          // { id, username, name, ... } for 1‑on‑1 or group
 let currentChatType = 'user';    // 'user' or 'group'
 let selectedDuration = 6;
 let usernameCheckTimer = null;
@@ -22,7 +22,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedUser = localStorage.getItem('nexus_user');
     if (savedUser) {
       currentUser = JSON.parse(savedUser);
-      // Validate session still alive
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
           showApp();
@@ -94,7 +93,6 @@ async function handleSignup() {
   if (password.length < 8) { showError(errEl, 'Password must be at least 8 characters.'); return; }
   if (!vibe) { showError(errEl, 'Pick your Vibe Word.'); return; }
 
-  // Real username check
   const { data: taken } = await supabase.from('profiles').select('username').eq('username', username).single();
   if (taken) { showError(errEl, `@${username} is already taken.`); return; }
 
@@ -106,7 +104,6 @@ async function handleSignup() {
 
   const user = data.user;
   if (user) {
-    // Insert profile (email confirmation is off, so user exists immediately)
     const { error: profileErr } = await supabase.from('profiles').insert({
       id: user.id, name, username, vibe
     });
@@ -116,7 +113,6 @@ async function handleSignup() {
     localStorage.setItem('nexus_user', JSON.stringify(currentUser));
     showApp();
   } else {
-    // Confirmation required (should not happen with email confirm off, but handle gracefully)
     document.getElementById('confirmEmail').textContent = email;
     successEl.classList.remove('hidden');
     successEl.textContent = '✓ Check your inbox.';
@@ -177,13 +173,11 @@ function updateProfileUI() {
     const el = document.getElementById(id);
     if (el) { el.textContent = initial; el.className = `avatar-fallback grad-${charGrad(initial)}`; }
   });
-  // Stats (approximate)
   updateStats();
 }
 
 async function updateStats() {
   if (!currentUser) return;
-  // count distinct contacts (people you've chatted with)
   const { data: contacts } = await supabase
     .from('messages')
     .select('sender_id, recipient_id')
@@ -194,7 +188,7 @@ async function updateStats() {
     if (m.recipient_id !== currentUser.id && m.recipient_id !== null) distinctUserIds.add(m.recipient_id);
   });
   document.getElementById('statContacts').textContent = distinctUserIds.size;
-  document.getElementById('statChats').textContent = distinctUserIds.size; // same for now
+  document.getElementById('statChats').textContent = distinctUserIds.size;
   const { count: groupCount } = await supabase
     .from('group_members').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
   document.getElementById('statGroups').textContent = groupCount || 0;
@@ -208,26 +202,22 @@ async function renderChatList() {
   list.innerHTML = '';
   if (!currentUser) return;
 
-  // Get all messages where I'm involved, group by partner
   const { data: msgs } = await supabase
     .from('messages')
-    .select('sender_id, recipient_id, text, created_at')
+    .select('sender_id, recipient_id, group_id, text, created_at')
     .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
     .order('created_at', { ascending: false });
 
-  // Build a map of partner_id -> latest message
   const partnerMap = new Map();
   msgs?.forEach(msg => {
-    const isGroup = msg.group_id != null; // skip group messages for now (handled in groups)
-    if (msg.group_id) return;
+    if (msg.group_id) return; // skip group messages
     const partnerId = msg.sender_id === currentUser.id ? msg.recipient_id : msg.sender_id;
     if (!partnerId) return;
     if (!partnerMap.has(partnerId) || msg.created_at > partnerMap.get(partnerId).created_at) {
-      partnerMap.set(partnerId, { text: msg.text, time: msg.created_at, unread: msg.sender_id !== currentUser.id ? 1 : 0 }); // simplistic unread
+      partnerMap.set(partnerId, { text: msg.text, time: msg.created_at, unread: msg.sender_id !== currentUser.id ? 1 : 0 });
     }
   });
 
-  // Fetch profile details for each partner
   const partnerIds = Array.from(partnerMap.keys());
   if (partnerIds.length === 0) {
     list.innerHTML = '<div class="chat-preview" style="padding:16px;text-align:center">No conversations yet. Tap + to start one.</div>';
@@ -268,7 +258,10 @@ async function renderGroupList() {
   list.innerHTML = '';
   if (!currentUser) return;
   const { data: memberships } = await supabase.from('group_members').select('group_id').eq('user_id', currentUser.id);
-  if (!memberships?.length) return;
+  if (!memberships?.length) {
+    list.innerHTML = '<div class="chat-preview" style="padding:16px;text-align:center">No groups yet. Create one!</div>';
+    return;
+  }
   const groupIds = memberships.map(m => m.group_id);
   const { data: groups } = await supabase.from('groups').select('*').in('id', groupIds);
   groups?.forEach(group => {
@@ -297,6 +290,10 @@ async function renderStatusList() {
   const list = document.getElementById('statusList');
   list.innerHTML = '';
   const { data: statuses } = await supabase.from('statuses').select('*, profiles(name)').gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false });
+  if (!statuses?.length) {
+    list.innerHTML = '<div class="chat-preview" style="padding:16px;text-align:center">No recent status updates.</div>';
+    return;
+  }
   statuses?.forEach(s => {
     const name = s.profiles?.name || 'Unknown';
     const initial = name.charAt(0).toUpperCase();
@@ -305,7 +302,7 @@ async function renderStatusList() {
     div.innerHTML = `
       <div class="status-ring">
         <div class="status-ring-inner">
-          <div class="avatar-fallback grad-${charGrad(initial)}" style="border-radius:50%;font-size:16px;...">${initial}</div>
+          <div class="avatar-fallback grad-${charGrad(initial)}" style="border-radius:50%;font-size:16px;font-family:var(--font-display);font-weight:700;color:white;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">${initial}</div>
         </div>
       </div>
       <div>
@@ -361,10 +358,6 @@ function subscribeToMessages() {
   unsubscribeMessages();
   let filter;
   if (currentChatType === 'user') {
-    filter = `sender_id=eq.${currentUser.id},recipient_id=eq.${currentChat.id}`;
-    // Simplified: we can subscribe to both directions with separate channels, but for simplicity subscribe to all messages and filter client-side.
-    // Better approach: use a channel that listens to INSERT on messages with a server-side filter.
-    // Supabase Realtime doesn't support OR filter directly, so we'll listen to both conditions via two channels.
     const channel1 = supabase.channel('user-msg-1')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `sender_id=eq.${currentUser.id}` }, payload => {
         if (payload.new.recipient_id === currentChat.id) appendMessage(payload.new, true);
@@ -397,7 +390,6 @@ function appendMessage(msg, scroll = true) {
   row.className = `msg-row ${isMe ? 'outgoing' : 'incoming'}`;
   const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   if (!isMe) {
-    // In a group, show sender name? For simplicity, show avatar initial.
     const initial = currentChat?.name?.charAt(0).toUpperCase() || '?';
     row.innerHTML = `
       <div class="msg-avatar-mini grad-${charGrad(initial)}">${initial}</div>
@@ -447,7 +439,9 @@ async function searchUsername(query) {
   const { data } = await supabase.from('profiles').select('*').ilike('username', `%${query}%`).neq('id', currentUser.id).limit(5);
   resultsDiv.innerHTML = data?.map(p => `
     <div class="chat-item" onclick="startChatWith('${p.id}', '${p.name.replace(/'/g, "\\'")}', '${p.username}')" style="cursor:pointer;margin:4px 0;">
-      <div class="chat-avatar"><div class="avatar-fallback grad-${charGrad(p.name.charAt(0))}">${p.name.charAt(0).toUpperCase()}</div></div>
+      <div class="chat-avatar">
+        <div class="avatar-fallback grad-${charGrad(p.name.charAt(0))}">${p.name.charAt(0).toUpperCase()}</div>
+      </div>
       <div class="chat-info">
         <div class="chat-name">${p.name}</div>
         <div class="chat-preview">@${p.username} · ${p.vibe}</div>
@@ -473,12 +467,9 @@ async function createGroup() {
   const membersRaw = document.getElementById('groupMembersInput').value.trim();
   if (!name) { showToast('Group name required'); return; }
   const usernames = membersRaw.split(',').map(s => s.trim()).filter(Boolean);
-  // Create group
   const { data: group, error } = await supabase.from('groups').insert({ name, creator_id: currentUser.id }).select().single();
   if (error) { showToast('Group creation failed'); return; }
-  // Add creator
   await supabase.from('group_members').insert({ group_id: group.id, user_id: currentUser.id });
-  // Add members by username
   for (const uname of usernames) {
     const { data: user } = await supabase.from('profiles').select('id').eq('username', uname).single();
     if (user) {
@@ -508,7 +499,7 @@ async function postStatus() {
 }
 
 // ═══════════════════════════════════════════════
-// UTILITY FUNCTIONS (unchanged from original, adapted)
+// UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════
 function handleMsgKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
 function scrollToBottom() { setTimeout(() => { const c = document.getElementById('messagesContainer'); if (c) c.scrollTop = c.scrollHeight; }, 50); }
@@ -548,11 +539,11 @@ async function editVibe() {
 }
 function showNotifSettings() { showToast('Coming soon'); }
 function showContactInfo() { showToast(currentChat?.name); }
-function openSearch() { showToast('Search coming soon'); }
+function openSearch() { showToast('Global search coming soon'); }
 function showAddStatus() { document.getElementById('statusModal').classList.remove('hidden'); }
 
 // ═══════════════════════════════════════════════
-// PULSE (unchanged simulation)
+// PULSE (simulation)
 // ═══════════════════════════════════════════════
 function blastPulse(emoji) {
   const feed = document.getElementById('pulseFeed');
@@ -616,25 +607,29 @@ function togglePw(inputId, btn) {
   input.type = input.type === 'password' ? 'text' : 'password';
   btn.style.color = input.type === 'text' ? 'var(--blue)' : 'var(--text-muted)';
 }
-function showToast(msg) { /* unchanged */ }
 function charGrad(c) { return c ? (c.toUpperCase().charCodeAt(0) % 8) : 0; }
-function escapeHtml(text) { return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escapeHtml(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 function switchTab(tab) {
   activeTab = tab;
   ['chats','groups','status','profile','pulse'].forEach(p => {
-    document.getElementById(p + 'Page').classList.toggle('active', p === tab);
-    document.getElementById('nav-' + p).classList.toggle('active', p === tab);
+    const pg = document.getElementById(p + 'Page');
+    const btn = document.getElementById('nav-' + p);
+    if (pg) pg.classList.toggle('active', p === tab);
+    if (btn) btn.classList.toggle('active', p === tab);
   });
   document.querySelector('.top-bar').style.display = (tab === 'profile' || tab === 'pulse') ? 'none' : 'flex';
 }
 function filterChats(q) {
   document.querySelectorAll('#chatList .chat-item').forEach(item => {
-    item.style.display = item.querySelector('.chat-name')?.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+    const name = item.querySelector('.chat-name')?.textContent || '';
+    item.style.display = name.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
   });
 }
 
 // ═══════════════════════════════════════════════
-// TOAST (re-include to be self-contained)
+// TOAST
 // ═══════════════════════════════════════════════
 let toastTimer;
 function showToast(msg) {
@@ -656,7 +651,7 @@ document.addEventListener('click', (e) => {
 });
 
 // ═══════════════════════════════════════════════
-// PASSWORD STRENGTH (unchanged)
+// PASSWORD STRENGTH
 // ═══════════════════════════════════════════════
 function checkPwStrength(pw) {
   const fill = document.getElementById('pwStrengthFill');
