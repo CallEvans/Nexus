@@ -8,6 +8,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <!-- Supabase SDK + Global Client Init -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://vtduxnjfbxwfuvnboqgc.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0ZHV4bmpmYnh3ZnV2bmJvcWdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMTI2MDYsImV4cCI6MjA5Mjg4ODYwNn0.65-ViVcecEbo7XCx4rOzLCL-g3eLztnQDSkja1l_nFM';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
 </head>
 <body>
 
@@ -236,7 +243,7 @@
       <button class="icon-btn" onclick="openSearch()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       </button>
-      <button class="icon-btn" onclick="openNewChat()">
+      <button class="icon-btn" onclick="openNewChatSearch()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>
       </button>
     </div>
@@ -249,7 +256,7 @@
     <div id="chatsPage" class="page active">
       <div class="page-hero">
         <h2 class="page-title">Chats</h2>
-        <span class="page-badge" id="unreadBadge">3</span>
+        <span class="page-badge" id="unreadBadge">0</span>
       </div>
 
       <div class="search-bar glass-input">
@@ -258,7 +265,7 @@
       </div>
 
       <div class="chat-list" id="chatList">
-        <!-- populated by JS -->
+        <!-- JS populated -->
       </div>
     </div>
 
@@ -275,7 +282,7 @@
       </div>
 
       <div class="chat-list" id="groupList">
-        <!-- populated by JS -->
+        <!-- JS populated -->
       </div>
     </div>
 
@@ -285,7 +292,6 @@
         <h2 class="page-title">Status</h2>
       </div>
 
-      <!-- My Status -->
       <div class="my-status-card glass-card-sm" onclick="showAddStatus()">
         <div class="my-status-avatar">
           <div class="avatar-wrap">
@@ -302,7 +308,7 @@
 
       <div class="section-label">Recent updates</div>
       <div class="status-list" id="statusList">
-        <!-- populated by JS -->
+        <!-- JS populated -->
       </div>
     </div>
 
@@ -322,29 +328,29 @@
 
         <div class="profile-info">
           <div class="profile-name-row">
-            <h2 class="profile-name" id="profileName">Ken</h2>
+            <h2 class="profile-name" id="profileName">User</h2>
             <button class="edit-name-btn" onclick="editName()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
           </div>
-          <p class="profile-username" id="profileUsername">@stain</p>
-          <div class="vibe-badge" id="profileVibeBadge">✦ chaotic</div>
+          <p class="profile-username" id="profileUsername">@anon</p>
+          <div class="vibe-badge" id="profileVibeBadge">✦ rare</div>
         </div>
       </div>
 
       <div class="profile-stats glass-card-sm">
         <div class="stat-item">
-          <span class="stat-num">247</span>
+          <span class="stat-num" id="statChats">0</span>
           <span class="stat-label">Chats</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-num">18</span>
+          <span class="stat-num" id="statGroups">0</span>
           <span class="stat-label">Groups</span>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <span class="stat-num">94</span>
+          <span class="stat-num" id="statContacts">0</span>
           <span class="stat-label">Contacts</span>
         </div>
       </div>
@@ -356,7 +362,7 @@
             <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <div class="settings-info">
               <span class="settings-label">Display Name</span>
-              <span class="settings-val" id="settingsName">Ken</span>
+              <span class="settings-val" id="settingsName">User</span>
             </div>
             <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
           </div>
@@ -364,14 +370,14 @@
             <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             <div class="settings-info">
               <span class="settings-label">Email</span>
-              <span class="settings-val" id="settingsEmail">ken@stain.dev</span>
+              <span class="settings-val" id="settingsEmail">-</span>
             </div>
           </div>
           <div class="settings-item glass-card-sm locked">
             <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <div class="settings-info">
               <span class="settings-label">Username</span>
-              <span class="settings-val locked-val">@stain <span class="lock-badge">locked</span></span>
+              <span class="settings-val locked-val">@<span id="settingsUsername">anon</span> <span class="lock-badge">locked</span></span>
             </div>
           </div>
         </div>
@@ -382,7 +388,7 @@
             <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             <div class="settings-info">
               <span class="settings-label">Vibe Word</span>
-              <span class="settings-val" id="settingsVibe">chaotic</span>
+              <span class="settings-val" id="settingsVibe">rare</span>
             </div>
             <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
           </div>
@@ -426,7 +432,14 @@
       </div>
       <span class="nav-label">Status</span>
     </button>
-    <!-- UNIQUE FEATURE: Pulse tab (live reaction layer — not on WhatsApp) -->
+    <!-- Profile tab (was missing) -->
+    <button class="nav-btn" id="nav-profile" onclick="switchTab('profile')">
+      <div class="nav-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-dot" id="dot-profile"></span>
+      </div>
+      <span class="nav-label">Profile</span>
+    </button>
     <button class="nav-btn pulse-nav" id="nav-pulse" onclick="switchTab('pulse')">
       <div class="nav-icon-wrap">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -436,7 +449,7 @@
     </button>
   </div>
 
-  <!-- PULSE PAGE (unique feature) -->
+  <!-- PULSE PAGE -->
   <div id="pulsePage" class="page pulse-page">
     <div class="pulse-header">
       <h2 class="page-title">Pulse</h2>
@@ -478,7 +491,7 @@
         <div class="avatar-fallback-sm" id="chatAvatarFallback">A</div>
       </div>
       <div>
-        <p class="chat-header-name" id="chatHeaderName">Adeola</p>
+        <p class="chat-header-name" id="chatHeaderName">Contact</p>
         <p class="chat-header-status" id="chatHeaderStatus">online</p>
       </div>
     </div>
@@ -496,7 +509,6 @@
     <div class="messages-list" id="messagesList"></div>
   </div>
 
-  <!-- Pulse reaction layer -->
   <div class="chat-pulse-layer" id="chatPulseLayer"></div>
 
   <div class="chat-input-bar glass-bar">
@@ -506,7 +518,7 @@
     <div class="chat-input-wrap glass-input">
       <input type="text" id="msgInput" placeholder="Message..." onkeydown="handleMsgKey(event)" />
     </div>
-    <button class="icon-btn pulse-quick-btn" onclick="showQuickPulse()" title="Send a pulse reaction">
+    <button class="icon-btn pulse-quick-btn" onclick="showQuickPulse()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     </button>
     <button class="send-btn" onclick="sendMessage()">
@@ -529,8 +541,25 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
-     ADD STATUS MODAL
+     NEW CHAT SEARCH MODAL
 ═══════════════════════════════════════════ -->
+<div id="newChatModal" class="modal-overlay hidden" onclick="closeModal('newChatModal')">
+  <div class="modal-card glass-card" onclick="event.stopPropagation()">
+    <h3 class="modal-title">Find by username</h3>
+    <div class="form-group">
+      <div class="input-wrap">
+        <span class="input-prefix">@</span>
+        <input type="text" id="searchUsernameInput" class="form-input input-with-prefix" placeholder="username" oninput="searchUsername(this.value)" />
+      </div>
+    </div>
+    <div id="searchResults" class="search-results"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('newChatModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD STATUS MODAL -->
 <div id="statusModal" class="modal-overlay hidden" onclick="closeModal('statusModal')">
   <div class="modal-card glass-card" onclick="event.stopPropagation()">
     <h3 class="modal-title">Add Status</h3>
@@ -553,9 +582,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     EDIT NAME MODAL
-═══════════════════════════════════════════ -->
+<!-- EDIT NAME MODAL -->
 <div id="editNameModal" class="modal-overlay hidden" onclick="closeModal('editNameModal')">
   <div class="modal-card glass-card" onclick="event.stopPropagation()">
     <h3 class="modal-title">Edit Display Name</h3>
@@ -571,9 +598,7 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     CREATE GROUP MODAL
-═══════════════════════════════════════════ -->
+<!-- CREATE GROUP MODAL -->
 <div id="createGroupModal" class="modal-overlay hidden" onclick="closeModal('createGroupModal')">
   <div class="modal-card glass-card" onclick="event.stopPropagation()">
     <h3 class="modal-title">New Group</h3>
@@ -584,10 +609,9 @@
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Add Members</label>
+      <label class="form-label">Add Members (usernames, comma separated)</label>
       <div class="input-wrap">
-        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" class="form-input" placeholder="Search by username..." />
+        <input type="text" id="groupMembersInput" class="form-input" placeholder="e.g. alice, bob" />
       </div>
     </div>
     <div class="modal-actions">
@@ -602,4 +626,4 @@
 
 <script src="app.js"></script>
 </body>
-</html>
+  </html>
