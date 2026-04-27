@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Nexus — Chat Reimagined</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SPLASH SCREEN
+═══════════════════════════════════════════ -->
+<div id="splash" class="splash">
+  <div class="splash-orb splash-orb-1"></div>
+  <div class="splash-orb splash-orb-2"></div>
+  <div class="splash-orb splash-orb-3"></div>
+  <div class="splash-logo">
+    <div class="splash-icon">
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+        <circle cx="28" cy="28" r="28" fill="url(#splashGrad)"/>
+        <path d="M14 20C14 18.3431 15.3431 17 17 17H39C40.6569 17 42 18.3431 42 20V32C42 33.6569 40.6569 35 39 35H30L24 41V35H17C15.3431 35 14 33.6569 14 32V20Z" fill="white" fill-opacity="0.95"/>
+        <circle cx="22" cy="26" r="2" fill="url(#splashGrad)"/>
+        <circle cx="28" cy="26" r="2" fill="url(#splashGrad)"/>
+        <circle cx="34" cy="26" r="2" fill="url(#splashGrad)"/>
+        <defs>
+          <linearGradient id="splashGrad" x1="0" y1="0" x2="56" y2="56">
+            <stop offset="0%" stop-color="#3B8BFF"/>
+            <stop offset="100%" stop-color="#FF4B6E"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <span class="splash-wordmark">nexus</span>
+  </div>
+  <p class="splash-tagline">where convos live</p>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     AUTH SCREEN
+═══════════════════════════════════════════ -->
+<div id="authScreen" class="screen hidden">
+  <div class="auth-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+    <div class="auth-orb auth-orb-3"></div>
+    <div class="auth-grid"></div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="loginPanel" class="auth-panel glass-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg width="36" height="36" viewBox="0 0 56 56" fill="none">
+          <circle cx="28" cy="28" r="28" fill="url(#lg1)"/>
+          <path d="M14 20C14 18.3431 15.3431 17 17 17H39C40.6569 17 42 18.3431 42 20V32C42 33.6569 40.6569 35 39 35H30L24 41V35H17C15.3431 35 14 33.6569 14 32V20Z" fill="white" fill-opacity="0.95"/>
+          <circle cx="22" cy="26" r="2" fill="url(#lg1)"/>
+          <circle cx="28" cy="26" r="2" fill="url(#lg1)"/>
+          <circle cx="34" cy="26" r="2" fill="url(#lg1)"/>
+          <defs><linearGradient id="lg1" x1="0" y1="0" x2="56" y2="56"><stop offset="0%" stop-color="#3B8BFF"/><stop offset="100%" stop-color="#FF4B6E"/></linearGradient></defs>
+        </svg>
+        <span>nexus</span>
+      </div>
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Sign in to your universe</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <div class="input-wrap">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <input type="email" id="loginEmail" class="form-input" placeholder="you@example.com" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="input-wrap">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" />
+        <button class="pw-toggle" onclick="togglePw('loginPassword', this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="loginError" class="form-error hidden"></div>
+
+    <button class="btn-primary" onclick="handleLogin()">
+      <span>Sign In</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+
+    <div class="auth-divider"><span>or</span></div>
+
+    <p class="auth-switch">New to Nexus? <button class="link-btn" onclick="showPanel('signupPanel')">Create account →</button></p>
+  </div>
+
+  <!-- SIGN UP -->
+  <div id="signupPanel" class="auth-panel glass-card hidden">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg width="36" height="36" viewBox="0 0 56 56" fill="none">
+          <circle cx="28" cy="28" r="28" fill="url(#sg1)"/>
+          <path d="M14 20C14 18.3431 15.3431 17 17 17H39C40.6569 17 42 18.3431 42 20V32C42 33.6569 40.6569 35 39 35H30L24 41V35H17C15.3431 35 14 33.6569 14 32V20Z" fill="white" fill-opacity="0.95"/>
+          <circle cx="22" cy="26" r="2" fill="url(#sg1)"/>
+          <circle cx="28" cy="26" r="2" fill="url(#sg1)"/>
+          <circle cx="34" cy="26" r="2" fill="url(#sg1)"/>
+          <defs><linearGradient id="sg1" x1="0" y1="0" x2="56" y2="56"><stop offset="0%" stop-color="#3B8BFF"/><stop offset="100%" stop-color="#FF4B6E"/></linearGradient></defs>
+        </svg>
+        <span>nexus</span>
+      </div>
+      <h1 class="auth-title">Join the wave</h1>
+      <p class="auth-sub">Create your identity</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Display Name <span class="form-hint">can be changed anytime</span></label>
+      <div class="input-wrap">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <input type="text" id="signupName" class="form-input" placeholder="Your name (anything goes ✦)" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Username <span class="form-hint permanent">permanent · like your phone number</span></label>
+      <div class="input-wrap">
+        <span class="input-prefix">@</span>
+        <input type="text" id="signupUsername" class="form-input input-with-prefix" placeholder="your_handle" oninput="checkUsername(this.value)" />
+        <div id="usernameStatus" class="username-status"></div>
+      </div>
+      <p class="field-note">⚠ Choose carefully — this can never be changed.</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <div class="input-wrap">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <input type="email" id="signupEmail" class="form-input" placeholder="you@example.com" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="input-wrap">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="signupPassword" class="form-input" placeholder="Min 8 characters" oninput="checkPwStrength(this.value)" />
+        <button class="pw-toggle" onclick="togglePw('signupPassword', this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div id="pwStrengthBar" class="pw-strength-bar"><div id="pwStrengthFill" class="pw-strength-fill"></div></div>
+      <span id="pwStrengthLabel" class="pw-strength-label"></span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Confirm Password</label>
+      <div class="input-wrap">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 12 2 2 4-4"/><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="signupConfirmPw" class="form-input" placeholder="Repeat password" />
+      </div>
+    </div>
+
+    <!-- UNIQUE FIELD: Vibe Word -->
+    <div class="form-group vibe-group">
+      <label class="form-label vibe-label">
+        <span class="vibe-spark">✦</span> Your Vibe Word
+        <span class="form-hint">what energy are you on?</span>
+      </label>
+      <p class="vibe-desc">One word that describes your entire personality. It shows as a badge on your profile. No other platform asks this.</p>
+      <div class="vibe-suggestions">
+        <button type="button" class="vibe-chip" onclick="setVibe(this)">chaotic</button>
+        <button type="button" class="vibe-chip" onclick="setVibe(this)">ethereal</button>
+        <button type="button" class="vibe-chip" onclick="setVibe(this)">unhinged</button>
+        <button type="button" class="vibe-chip" onclick="setVibe(this)">chill</button>
+        <button type="button" class="vibe-chip" onclick="setVibe(this)">menace</button>
+        <button type="button" class="vibe-chip" onclick="setVibe(this)">healing</button>
+        <button type="button" class="vibe-chip" onclick="setVibe(this)">rare</button>
+        <button type="button" class="vibe-chip" onclick="setVibe(this)">cosmic</button>
+      </div>
+      <div class="input-wrap" style="margin-top:10px">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <input type="text" id="signupVibe" class="form-input" placeholder="or type your own..." maxlength="20" />
+      </div>
+    </div>
+
+    <div id="signupError" class="form-error hidden"></div>
+    <div id="signupSuccess" class="form-success hidden"></div>
+
+    <button class="btn-primary" onclick="handleSignup()">
+      <span>Create Account</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+
+    <p class="auth-switch">Already on Nexus? <button class="link-btn" onclick="showPanel('loginPanel')">Sign in →</button></p>
+  </div>
+
+  <!-- EMAIL CONFIRM -->
+  <div id="confirmPanel" class="auth-panel glass-card hidden">
+    <div class="confirm-icon">📨</div>
+    <h2 class="auth-title">Check your inbox</h2>
+    <p class="auth-sub" style="max-width:300px;margin:0 auto 24px">We sent a confirmation link to <strong id="confirmEmail"></strong>. Click it to activate your account.</p>
+    <div class="confirm-note">Powered by Brevo SMTP — no rate limits, instant delivery</div>
+    <button class="btn-secondary" onclick="showPanel('loginPanel')">Back to Sign In</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════ -->
+<div id="appScreen" class="screen hidden">
+  <div class="app-bg">
+    <div class="app-orb app-orb-1"></div>
+    <div class="app-orb app-orb-2"></div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="top-bar glass-bar">
+    <div class="top-bar-left">
+      <div class="top-logo">
+        <svg width="22" height="22" viewBox="0 0 56 56" fill="none">
+          <circle cx="28" cy="28" r="28" fill="url(#tb1)"/>
+          <path d="M14 20C14 18.3431 15.3431 17 17 17H39C40.6569 17 42 18.3431 42 20V32C42 33.6569 40.6569 35 39 35H30L24 41V35H17C15.3431 35 14 33.6569 14 32V20Z" fill="white"/>
+          <circle cx="22" cy="26" r="2" fill="url(#tb1)"/>
+          <circle cx="28" cy="26" r="2" fill="url(#tb1)"/>
+          <circle cx="34" cy="26" r="2" fill="url(#tb1)"/>
+          <defs><linearGradient id="tb1" x1="0" y1="0" x2="56" y2="56"><stop offset="0%" stop-color="#3B8BFF"/><stop offset="100%" stop-color="#FF4B6E"/></linearGradient></defs>
+        </svg>
+        <span class="top-logo-text">nexus</span>
+      </div>
+    </div>
+    <div class="top-bar-right">
+      <button class="icon-btn" onclick="openSearch()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      <button class="icon-btn" onclick="openNewChat()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE CONTAINER -->
+  <div class="page-container">
+
+    <!-- CHATS PAGE -->
+    <div id="chatsPage" class="page active">
+      <div class="page-hero">
+        <h2 class="page-title">Chats</h2>
+        <span class="page-badge" id="unreadBadge">3</span>
+      </div>
+
+      <div class="search-bar glass-input">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search chats..." oninput="filterChats(this.value)" />
+      </div>
+
+      <div class="chat-list" id="chatList">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- GROUPS PAGE -->
+    <div id="groupsPage" class="page">
+      <div class="page-hero">
+        <h2 class="page-title">Groups</h2>
+        <button class="create-btn" onclick="showCreateGroup()">+ New</button>
+      </div>
+
+      <div class="search-bar glass-input">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search groups..." />
+      </div>
+
+      <div class="chat-list" id="groupList">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- STATUS PAGE -->
+    <div id="statusPage" class="page">
+      <div class="page-hero">
+        <h2 class="page-title">Status</h2>
+      </div>
+
+      <!-- My Status -->
+      <div class="my-status-card glass-card-sm" onclick="showAddStatus()">
+        <div class="my-status-avatar">
+          <div class="avatar-wrap">
+            <img src="" id="myStatusAvatar" class="avatar-img" onerror="this.style.display='none'" />
+            <div class="avatar-fallback" id="myStatusFallback">K</div>
+          </div>
+          <div class="status-add-btn">+</div>
+        </div>
+        <div class="my-status-info">
+          <p class="my-status-name">My Status</p>
+          <p class="my-status-sub">Tap to add a status update</p>
+        </div>
+      </div>
+
+      <div class="section-label">Recent updates</div>
+      <div class="status-list" id="statusList">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="profilePage" class="page">
+      <div class="profile-hero">
+        <div class="profile-avatar-wrap" onclick="triggerAvatarUpload()">
+          <div class="profile-avatar-ring">
+            <img src="" id="profileAvatar" class="profile-avatar-img" onerror="this.style.display='none'" />
+            <div class="profile-avatar-fallback" id="profileFallback">K</div>
+          </div>
+          <div class="avatar-edit-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="handleAvatarUpload(this)" />
+
+        <div class="profile-info">
+          <div class="profile-name-row">
+            <h2 class="profile-name" id="profileName">Ken</h2>
+            <button class="edit-name-btn" onclick="editName()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+          </div>
+          <p class="profile-username" id="profileUsername">@stain</p>
+          <div class="vibe-badge" id="profileVibeBadge">✦ chaotic</div>
+        </div>
+      </div>
+
+      <div class="profile-stats glass-card-sm">
+        <div class="stat-item">
+          <span class="stat-num">247</span>
+          <span class="stat-label">Chats</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">18</span>
+          <span class="stat-label">Groups</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">94</span>
+          <span class="stat-label">Contacts</span>
+        </div>
+      </div>
+
+      <div class="settings-list">
+        <div class="settings-section">
+          <p class="settings-section-label">Account</p>
+          <div class="settings-item glass-card-sm" onclick="editName()">
+            <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <div class="settings-info">
+              <span class="settings-label">Display Name</span>
+              <span class="settings-val" id="settingsName">Ken</span>
+            </div>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+          <div class="settings-item glass-card-sm">
+            <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <div class="settings-info">
+              <span class="settings-label">Email</span>
+              <span class="settings-val" id="settingsEmail">ken@stain.dev</span>
+            </div>
+          </div>
+          <div class="settings-item glass-card-sm locked">
+            <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div class="settings-info">
+              <span class="settings-label">Username</span>
+              <span class="settings-val locked-val">@stain <span class="lock-badge">locked</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <p class="settings-section-label">Preferences</p>
+          <div class="settings-item glass-card-sm" onclick="editVibe()">
+            <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <div class="settings-info">
+              <span class="settings-label">Vibe Word</span>
+              <span class="settings-val" id="settingsVibe">chaotic</span>
+            </div>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+          <div class="settings-item glass-card-sm" onclick="showNotifSettings()">
+            <svg class="settings-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <div class="settings-info">
+              <span class="settings-label">Notifications</span>
+            </div>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <button class="btn-danger" onclick="handleLogout()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-container -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav glass-bar">
+    <button class="nav-btn active" id="nav-chats" onclick="switchTab('chats')">
+      <div class="nav-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="nav-dot" id="dot-chats"></span>
+      </div>
+      <span class="nav-label">Chats</span>
+    </button>
+    <button class="nav-btn" id="nav-groups" onclick="switchTab('groups')">
+      <div class="nav-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-dot" id="dot-groups"></span>
+      </div>
+      <span class="nav-label">Groups</span>
+    </button>
+    <button class="nav-btn" id="nav-status" onclick="switchTab('status')">
+      <div class="nav-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="nav-dot" id="dot-status"></span>
+      </div>
+      <span class="nav-label">Status</span>
+    </button>
+    <!-- UNIQUE FEATURE: Pulse tab (live reaction layer — not on WhatsApp) -->
+    <button class="nav-btn pulse-nav" id="nav-pulse" onclick="switchTab('pulse')">
+      <div class="nav-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span class="nav-live-dot"></span>
+      </div>
+      <span class="nav-label">Pulse</span>
+    </button>
+  </div>
+
+  <!-- PULSE PAGE (unique feature) -->
+  <div id="pulsePage" class="page pulse-page">
+    <div class="pulse-header">
+      <h2 class="page-title">Pulse</h2>
+      <span class="live-chip">● LIVE</span>
+    </div>
+    <p class="pulse-desc">Real-time emoji reactions floating across all your active chats simultaneously. Your contacts see them too.</p>
+    <div class="pulse-feed" id="pulseFeed"></div>
+    <div class="pulse-launcher">
+      <p class="pulse-launcher-label">Blast a reaction →</p>
+      <div class="pulse-emojis">
+        <button class="pulse-emoji-btn" onclick="blastPulse('🔥')">🔥</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('💙')">💙</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('😭')">😭</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('⚡')">⚡</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('🥶')">🥶</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('💀')">💀</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('✨')">✨</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('🫀')">🫀</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /appScreen -->
+
+<!-- ═══════════════════════════════════════════
+     CHAT VIEW
+═══════════════════════════════════════════ -->
+<div id="chatView" class="screen hidden">
+  <div class="chat-bg">
+    <div class="chat-orb chat-orb-1"></div>
+    <div class="chat-orb chat-orb-2"></div>
+  </div>
+  <div class="chat-top-bar glass-bar">
+    <button class="icon-btn back-btn" onclick="closeChatView()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <div class="chat-header-info" onclick="showContactInfo()">
+      <div class="chat-avatar-sm">
+        <div class="avatar-fallback-sm" id="chatAvatarFallback">A</div>
+      </div>
+      <div>
+        <p class="chat-header-name" id="chatHeaderName">Adeola</p>
+        <p class="chat-header-status" id="chatHeaderStatus">online</p>
+      </div>
+    </div>
+    <div class="chat-actions">
+      <button class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.5 2 2 0 0 1 3.6 1.32h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </button>
+      <button class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="messages-container" id="messagesContainer">
+    <div class="messages-list" id="messagesList"></div>
+  </div>
+
+  <!-- Pulse reaction layer -->
+  <div class="chat-pulse-layer" id="chatPulseLayer"></div>
+
+  <div class="chat-input-bar glass-bar">
+    <button class="icon-btn attach-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+    </button>
+    <div class="chat-input-wrap glass-input">
+      <input type="text" id="msgInput" placeholder="Message..." onkeydown="handleMsgKey(event)" />
+    </div>
+    <button class="icon-btn pulse-quick-btn" onclick="showQuickPulse()" title="Send a pulse reaction">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </button>
+    <button class="send-btn" onclick="sendMessage()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
+  <!-- Quick Pulse Panel -->
+  <div id="quickPulsePanel" class="quick-pulse-panel glass-card hidden">
+    <p class="quick-pulse-title">⚡ Pulse Reaction</p>
+    <div class="pulse-emojis">
+      <button class="pulse-emoji-btn" onclick="sendChatPulse('🔥')">🔥</button>
+      <button class="pulse-emoji-btn" onclick="sendChatPulse('💙')">💙</button>
+      <button class="pulse-emoji-btn" onclick="sendChatPulse('😭')">😭</button>
+      <button class="pulse-emoji-btn" onclick="sendChatPulse('⚡')">⚡</button>
+      <button class="pulse-emoji-btn" onclick="sendChatPulse('🥶')">🥶</button>
+      <button class="pulse-emoji-btn" onclick="sendChatPulse('💀')">💀</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ADD STATUS MODAL
+═══════════════════════════════════════════ -->
+<div id="statusModal" class="modal-overlay hidden" onclick="closeModal('statusModal')">
+  <div class="modal-card glass-card" onclick="event.stopPropagation()">
+    <h3 class="modal-title">Add Status</h3>
+    <div class="form-group">
+      <label class="form-label">Status Text</label>
+      <textarea id="statusText" class="form-textarea glass-input" placeholder="What's on your mind?" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Duration</label>
+      <div class="duration-chips">
+        <button class="duration-chip active" onclick="setDuration(this, 6)">6 hours</button>
+        <button class="duration-chip" onclick="setDuration(this, 12)">12 hours</button>
+        <button class="duration-chip" onclick="setDuration(this, 24)">24 hours</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('statusModal')">Cancel</button>
+      <button class="btn-primary" onclick="postStatus()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     EDIT NAME MODAL
+═══════════════════════════════════════════ -->
+<div id="editNameModal" class="modal-overlay hidden" onclick="closeModal('editNameModal')">
+  <div class="modal-card glass-card" onclick="event.stopPropagation()">
+    <h3 class="modal-title">Edit Display Name</h3>
+    <div class="form-group">
+      <div class="input-wrap">
+        <input type="text" id="newNameInput" class="form-input" placeholder="Your name (special chars OK ✦)" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('editNameModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveName()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     CREATE GROUP MODAL
+═══════════════════════════════════════════ -->
+<div id="createGroupModal" class="modal-overlay hidden" onclick="closeModal('createGroupModal')">
+  <div class="modal-card glass-card" onclick="event.stopPropagation()">
+    <h3 class="modal-title">New Group</h3>
+    <div class="form-group">
+      <label class="form-label">Group Name</label>
+      <div class="input-wrap">
+        <input type="text" id="groupNameInput" class="form-input" placeholder="Squad name..." />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Add Members</label>
+      <div class="input-wrap">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="form-input" placeholder="Search by username..." />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('createGroupModal')">Cancel</button>
+      <button class="btn-primary" onclick="createGroup()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
