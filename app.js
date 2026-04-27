@@ -7,8 +7,8 @@
 
 // ── CONFIG ─────────────────────────────────────────────
 // Replace with your actual Supabase credentials
-const SUPABASE_URL = 'https://your-project.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-key';
+const SUPABASE_URL = 'https://vtduxnjfbxwfuvnboqgc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0ZHV4bmpmYnh3ZnV2bmJvcWdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMTI2MDYsImV4cCI6MjA5Mjg4ODYwNn0.65-ViVcecEbo7XCx4rOzLCL-g3eLztnQDSkja1l_nFM';
 
 // ── STATE ──────────────────────────────────────────────
 let currentUser = null;
