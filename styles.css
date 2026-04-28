@@ -1405,3 +1405,45 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .grad-5 { background: linear-gradient(135deg,#10b981,#059669); }
 .grad-6 { background: linear-gradient(135deg,#ec4899,#db2777); }
 .grad-7 { background: linear-gradient(135deg,#f97316,#ea580c); }
+
+/* ── SEARCH RESULTS (new chat user search) ─────────────── */
+.search-results {
+  margin-top: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  border-radius: var(--radius-sm);
+}
+.search-results .chat-item {
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 2px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  transition: background 0.15s;
+}
+.search-results .chat-item:hover {
+  background: var(--surface-hover);
+}
+.search-results-empty {
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── EMPTY STATES & LOADING ──────────────────────────── */
+.empty-state {
+  padding: 40px 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.empty-state strong { color: var(--blue); }
+.chat-loading {
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
