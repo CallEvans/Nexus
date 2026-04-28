@@ -84,16 +84,17 @@ async function handleLogin() {
     return;
   }
 
-  let data, error;
-  try {
-    ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
-  } catch (e) {
-    showError(errEl, 'Network error. Please try again.');
-    return;
-  }
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    showError(errEl, error.message);
+    // Show the real Supabase error — not a generic message
+    if (error.message.toLowerCase().includes('invalid')) {
+      showError(errEl, 'Incorrect email or password.');
+    } else if (error.message.toLowerCase().includes('confirm')) {
+      showError(errEl, 'Please confirm your email first. Check your inbox.');
+    } else {
+      showError(errEl, error.message);
+    }
     return;
   }
 
@@ -280,6 +281,20 @@ function checkUsername(val) {
 // ═══════════════════════════════════════════════
 async function showApp() {
   showScreen('appScreen');
+
+  // Always refresh profile from DB — don't trust stale localStorage
+  if (currentUser?.id) {
+    const { data: profile } = await supabase
+      .from('profiles').select('*').eq('id', currentUser.id).single();
+    if (profile) {
+      currentUser.name     = profile.name;
+      currentUser.username = profile.username;
+      currentUser.vibe     = profile.vibe;
+      currentUser.avatar   = profile.avatar_url || null;
+      localStorage.setItem('nexus_user', JSON.stringify(currentUser));
+    }
+  }
+
   updateProfileUI();
   switchTab('chats');
   await Promise.all([renderChatList(), renderGroupList(), renderStatusList()]);
@@ -515,16 +530,31 @@ function closeChatView() {
 async function renderMessages() {
   const list = document.getElementById('messagesList');
   list.innerHTML = '';
-  let query = supabase.from('messages').select('*').order('created_at', { ascending: true });
+
+  let all = [];
   if (currentChatType === 'user') {
-    query = query.or(
-      `and(sender_id.eq.${currentUser.id},recipient_id.eq.${currentChat.id}),and(sender_id.eq.${currentChat.id},recipient_id.eq.${currentUser.id})`
+    // Two separate queries — the .or() nested and() syntax is unreliable in Supabase JS v2
+    const { data: sent } = await supabase
+      .from('messages').select('*')
+      .eq('sender_id', currentUser.id)
+      .eq('recipient_id', currentChat.id)
+      .order('created_at', { ascending: true });
+    const { data: received } = await supabase
+      .from('messages').select('*')
+      .eq('sender_id', currentChat.id)
+      .eq('recipient_id', currentUser.id)
+      .order('created_at', { ascending: true });
+    all = [...(sent || []), ...(received || [])].sort(
+      (a, b) => new Date(a.created_at) - new Date(b.created_at)
     );
   } else {
-    query = query.eq('group_id', currentChat.id);
+    const { data: msgs } = await supabase
+      .from('messages').select('*')
+      .eq('group_id', currentChat.id)
+      .order('created_at', { ascending: true });
+    all = msgs || [];
   }
-  const { data: messages } = await query;
-  messages?.forEach(msg => appendMessage(msg, false));
+  all.forEach(msg => appendMessage(msg, false));
   scrollToBottom();
 }
 
@@ -595,20 +625,19 @@ function appendMessage(msg, scroll = true) {
 async function sendMessage() {
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
-  if (!text || !currentChat) return;
-  const msg = {
-    sender_id: currentUser.id,
-    recipient_id: currentChatType === 'user' ? currentChat.id : null,
-    group_id: currentChatType === 'group' ? currentChat.id : null,
+  if (!text || !currentChat || !currentUser) return;
+  input.value = ''; // clear immediately for snappy UX
+  const { error } = await supabase.from('messages').insert({
+    sender_id:    currentUser.id,
+    recipient_id: currentChatType === 'user'  ? currentChat.id : null,
+    group_id:     currentChatType === 'group' ? currentChat.id : null,
     text
-  };
-  const { error } = await supabase.from('messages').insert(msg);
+  });
   if (error) {
-    showToast('Send failed');
+    showToast('Send failed: ' + error.message);
+    input.value = text; // restore on failure
     console.error(error);
-    return;
   }
-  input.value = '';
 }
 
 // ═══════════════════════════════════════════════
@@ -721,17 +750,35 @@ function setDuration(btn, hours) {
   btn.classList.add('active');
 }
 function triggerAvatarUpload() { document.getElementById('avatarInput').click(); }
-function handleAvatarUpload(input) {
+async function handleAvatarUpload(input) {
   const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    document.getElementById('profileAvatar').src = e.target.result;
-    document.getElementById('profileAvatar').style.display = 'block';
-    document.getElementById('profileFallback').style.display = 'none';
-    showToast('Profile picture updated (local)');
-  };
-  reader.readAsDataURL(file);
+  if (!file || !currentUser) return;
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  const filePath = `${currentUser.id}/avatar.${ext}`;
+
+  const { error: uploadErr } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, { upsert: true });
+
+  if (uploadErr) {
+    showToast('Upload failed: ' + uploadErr.message);
+    return;
+  }
+
+  const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+  const avatarUrl = urlData.publicUrl;
+
+  await supabase.from('profiles').update({ avatar_url: avatarUrl }).eq('id', currentUser.id);
+
+  currentUser.avatar = avatarUrl;
+  localStorage.setItem('nexus_user', JSON.stringify(currentUser));
+
+  const img = document.getElementById('profileAvatar');
+  img.src = avatarUrl;
+  img.style.display = 'block';
+  document.getElementById('profileFallback').style.display = 'none';
+  showToast('Profile picture updated ✓');
 }
 function editName() {
   document.getElementById('newNameInput').value = currentUser?.name || '';
