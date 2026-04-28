@@ -18,28 +18,41 @@ let messagesSubscription = null;
 // INIT
 // ═══════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(async () => {
+  setTimeout(() => {
     document.getElementById('splash').style.display = 'none';
 
-    const { data: { session } } = await supabase.auth.getSession();
+    // Make sure supabase client exists (fallback if script failed)
+    if (typeof supabase === 'undefined') {
+      showScreen('authScreen');
+      showPanel('loginPanel');
+      return;
+    }
 
-    if (session) {
-      const { data: profile } = await supabase
-        .from('profiles').select('*').eq('id', session.user.id).single();
-
-      if (profile) {
-        currentUser = {
-          id: session.user.id, name: profile.name, username: profile.username,
-          email: session.user.email, vibe: profile.vibe, avatar: profile.avatar_url || null
-        };
-        localStorage.setItem('nexus_user', JSON.stringify(currentUser));
-        showApp();
-      } else {
-        showScreen('authScreen'); showPanel('loginPanel');
-      }
+    const savedUser = localStorage.getItem('nexus_user');
+    if (savedUser) {
+      currentUser = JSON.parse(savedUser);
+      supabase.auth.getSession()
+        .then(({ data: { session } }) => {
+          if (session) {
+            showApp();
+          } else {
+            localStorage.removeItem('nexus_user');
+            currentUser = null;
+            showScreen('authScreen');
+            showPanel('loginPanel');
+          }
+        })
+        .catch((err) => {
+          // Session check failed – show auth screen instead of black screen
+          console.error('Session check error:', err);
+          localStorage.removeItem('nexus_user');
+          currentUser = null;
+          showScreen('authScreen');
+          showPanel('loginPanel');
+        });
     } else {
-      localStorage.removeItem('nexus_user');
-      showScreen('authScreen'); showPanel('loginPanel');
+      showScreen('authScreen');
+      showPanel('loginPanel');
     }
   }, 2900);
 });
