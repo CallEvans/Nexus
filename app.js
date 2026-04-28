@@ -98,7 +98,6 @@ async function handleLogin() {
   }
 
   // No email_confirmed_at check — Supabase already handles that
-  // when "Confirm email" is ON, signInWithPassword rejects unconfirmed users
 
   const { data: profile, error: profileErr } = await supabase
     .from('profiles')
@@ -124,7 +123,7 @@ async function handleLogin() {
 }
 
 // ═══════════════════════════════════════════════
-// SIGN UP
+// SIGN UP (updated — works with both email confirmation ON or OFF)
 // ═══════════════════════════════════════════════
 async function handleSignup() {
   const name = document.getElementById('signupName').value.trim();
@@ -194,38 +193,26 @@ async function handleSignup() {
     return;
   }
 
-  // If email confirmation is OFF, session is returned immediately
-  // If ON, session is null and user must click the link
+  // Always create profile row for the new user
+  if (data.user) {
+    const { error: insertErr } = await supabase
+      .from('profiles')
+      .insert({ id: data.user.id, name, username, vibe });
+    // Ignore duplicate key error if row already exists
+    if (insertErr && insertErr.code !== '23505') {
+      showError(errEl, 'Profile creation failed. Please try again.');
+      return;
+    }
+  }
+
+  // Email confirmation ON → show the inbox panel
   if (!data.session) {
-    // Email confirmation required
     document.getElementById('confirmEmail').textContent = email;
     showPanel('confirmPanel');
     return;
   }
 
-  // Email confirmation is OFF — user is logged in immediately
-  // Create the profile row
-  try {
-    const { error: insertErr } = await supabase
-      .from('profiles')
-      .insert({ id: data.user.id, name, username, vibe });
-    if (insertErr) {
-      // If duplicate, try update instead (shouldn't happen with new users)
-      if (insertErr.code === '23505') {
-        await supabase
-          .from('profiles')
-          .update({ name, vibe })
-          .eq('id', data.user.id);
-      } else {
-        showError(errEl, 'Profile creation failed. Please try again.');
-        return;
-      }
-    }
-  } catch (e) {
-    showError(errEl, 'Profile creation failed. Please try again.');
-    return;
-  }
-
+  // Email confirmation OFF → log them in immediately
   currentUser = {
     id: data.user.id,
     name,
@@ -945,4 +932,4 @@ function setVibe(btn) {
   document.querySelectorAll('.vibe-chip').forEach(c => c.classList.remove('selected'));
   btn.classList.add('selected');
   document.getElementById('signupVibe').value = btn.textContent;
-}
+        }
