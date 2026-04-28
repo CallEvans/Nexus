@@ -8,13 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-  <!-- Supabase SDK + Global Client Init -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = 'https://vtduxnjfbxwfuvnboqgc.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0ZHV4bmpmYnh3ZnV2bmJvcWdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMTI2MDYsImV4cCI6MjA5Mjg4ODYwNn0.65-ViVcecEbo7XCx4rOzLCL-g3eLztnQDSkja1l_nFM';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  </script>
 </head>
 <body>
 
@@ -407,30 +400,6 @@
       </div>
     </div>
 
-  <!-- PULSE PAGE -->
-<!-- PULSE PAGE -->
-  <div id="pulsePage" class="page pulse-page">
-    <div class="pulse-header">
-      <h2 class="page-title">Pulse</h2>
-      <span class="live-chip">● LIVE</span>
-    </div>
-    <p class="pulse-desc">Real-time emoji reactions floating across all your active chats simultaneously. Your contacts see them too.</p>
-    <div class="pulse-feed" id="pulseFeed"></div>
-    <div class="pulse-launcher">
-      <p class="pulse-launcher-label">Blast a reaction →</p>
-      <div class="pulse-emojis">
-        <button class="pulse-emoji-btn" onclick="blastPulse('🔥')">🔥</button>
-        <button class="pulse-emoji-btn" onclick="blastPulse('💙')">💙</button>
-        <button class="pulse-emoji-btn" onclick="blastPulse('😭')">😭</button>
-        <button class="pulse-emoji-btn" onclick="blastPulse('⚡')">⚡</button>
-        <button class="pulse-emoji-btn" onclick="blastPulse('🥶')">🥶</button>
-        <button class="pulse-emoji-btn" onclick="blastPulse('💀')">💀</button>
-        <button class="pulse-emoji-btn" onclick="blastPulse('✨')">✨</button>
-        <button class="pulse-emoji-btn" onclick="blastPulse('🫀')">🫀</button>
-      </div>
-    </div>
-  </div>
-
   </div><!-- /page-container -->
 
   <!-- BOTTOM NAV -->
@@ -456,7 +425,7 @@
       </div>
       <span class="nav-label">Status</span>
     </button>
-    <!-- Profile tab (was missing) -->
+    <!-- Profile tab -->
     <button class="nav-btn" id="nav-profile" onclick="switchTab('profile')">
       <div class="nav-icon-wrap">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -472,6 +441,30 @@
       <span class="nav-label">Pulse</span>
     </button>
   </div>
+
+  <!-- PULSE PAGE -->
+  <div id="pulsePage" class="page pulse-page">
+    <div class="pulse-header">
+      <h2 class="page-title">Pulse</h2>
+      <span class="live-chip">● LIVE</span>
+    </div>
+    <p class="pulse-desc">Real-time emoji reactions floating across all your active chats simultaneously. Your contacts see them too.</p>
+    <div class="pulse-feed" id="pulseFeed"></div>
+    <div class="pulse-launcher">
+      <p class="pulse-launcher-label">Blast a reaction →</p>
+      <div class="pulse-emojis">
+        <button class="pulse-emoji-btn" onclick="blastPulse('🔥')">🔥</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('💙')">💙</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('😭')">😭</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('⚡')">⚡</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('🥶')">🥶</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('💀')">💀</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('✨')">✨</button>
+        <button class="pulse-emoji-btn" onclick="blastPulse('🫀')">🫀</button>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /appScreen -->
 
 <!-- ═══════════════════════════════════════════
@@ -624,6 +617,13 @@
 <!-- TOAST -->
 <div id="toast" class="toast hidden"></div>
 
+<!-- Supabase SDK and initialization (moved to bottom to avoid race conditions) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://vtduxnjfbxwfuvnboqgc.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0ZHV4bmpmYnh3ZnV2bmJvcWdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMTI2MDYsImV4cCI6MjA5Mjg4ODYwNn0.65-ViVcecEbo7XCx4rOzLCL-g3eLztnQDSkja1l_nFM';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 <script src="app.js"></script>
 </body>
-  </html>
+          </html>
