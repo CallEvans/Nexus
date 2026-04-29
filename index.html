@@ -402,7 +402,6 @@
 
 
   <!-- PULSE PAGE -->
-  <!-- PULSE PAGE -->
   <div id="pulsePage" class="page pulse-page">
     <div class="pulse-header">
       <h2 class="page-title">Pulse</h2>
@@ -624,8 +623,10 @@
 <script>
   const SUPABASE_URL = 'https://vtduxnjfbxwfuvnboqgc.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0ZHV4bmpmYnh3ZnV2bmJvcWdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMTI2MDYsImV4cCI6MjA5Mjg4ODYwNn0.65-ViVcecEbo7XCx4rOzLCL-g3eLztnQDSkja1l_nFM';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Use the supabaseJs namespace to avoid overwriting window.supabase
+  const { createClient } = window.supabase;
+  window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 <script src="app.js"></script>
 </body>
-          </html>
+</html>
